@@ -20,12 +20,6 @@
       </div>
 
       <div class="header-controls">
-        <button type="button" class="btn-icon" id="btnSearchModal" title="Tra cứu câu hỏi" aria-label="Tra cứu câu hỏi">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
         <button type="button" class="btn-icon" id="btnHistory" title="Lịch sử làm bài" aria-label="Lịch sử làm bài">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -73,10 +67,6 @@
           <button type="button" class="btn-toggle active" id="btnViewList" title="Xem dạng danh sách cuộn">Danh sách</button>
           <button type="button" class="btn-toggle" id="btnViewFocus" title="Xem từng câu">Từng câu</button>
         </div>
-
-        <button type="button" class="btn btn-success" id="btnSubmit" style="display: none;">
-          Nộp bài
-        </button>
       </div>
     </section>
 
@@ -192,21 +182,6 @@
     </div>
   </div>
 
-  <!-- Search Question Bank Modal -->
-  <div class="modal-overlay" id="searchModal">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h2 class="modal-title">Tra Cứu Câu Hỏi</h2>
-        <button type="button" class="btn-close" id="btnCloseSearch">&times;</button>
-      </div>
-      <input type="text" id="searchInput" class="search-input" placeholder="Nhập từ khóa tìm kiếm trong ngân hàng câu hỏi..." autofocus>
-      <div class="search-results-list" id="searchResults">
-        <div style="color: var(--text-muted); text-align: center; padding: 1.5rem;">
-          Nhập từ khóa để tra cứu câu hỏi và đáp án...
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Footer -->
   <footer class="app-footer">

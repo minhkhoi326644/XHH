@@ -1200,12 +1200,6 @@ body.large-font {
     font-size: 0.8rem;
   }
   
-  .exam-controls-right #btnSubmit {
-    flex: 1;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.9rem;
-  }
-  
   .question-card {
     padding: 1rem 0.85rem;
   }

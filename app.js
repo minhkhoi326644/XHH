@@ -37,7 +37,6 @@
   // DOM Elements
   const el = {
     btnRetake: document.getElementById('btnRetake'),
-    btnSubmit: document.getElementById('btnSubmit'),
     btnToggleTimer: document.getElementById('btnToggleTimer'),
     timerDisplay: document.getElementById('timerDisplay'),
     timerBox: document.getElementById('timerBox'),
@@ -65,12 +64,6 @@
     btnCloseHistory: document.getElementById('btnCloseHistory'),
     historyTableBody: document.getElementById('historyTableBody'),
     btnClearHistory: document.getElementById('btnClearHistory'),
-    
-    searchModal: document.getElementById('searchModal'),
-    btnSearchModal: document.getElementById('btnSearchModal'),
-    btnCloseSearch: document.getElementById('btnCloseSearch'),
-    searchInput: document.getElementById('searchInput'),
-    searchResults: document.getElementById('searchResults'),
     
     themeToggle: document.getElementById('themeToggle'),
     themeIcon: document.getElementById('themeIcon'),
@@ -509,9 +502,6 @@
     el.questionsContainer.innerHTML = '';
 
     if (state.viewMode === 'list') {
-      // Ẩn nút nộp bài ở thanh trên khi xem dạng danh sách
-      if (el.btnSubmit) el.btnSubmit.style.display = 'none';
-
       const cardsHTML = state.activeQuestions.map((q, idx) => {
         if (state.isSubmitted && state.activeFilter !== 'all') {
           const userChoice = state.userAnswers[idx];
@@ -542,9 +532,6 @@
         });
       }
     } else {
-      // Hiện nút nộp bài ở thanh trên khi xem dạng từng câu
-      if (el.btnSubmit) el.btnSubmit.style.display = !state.isSubmitted ? 'inline-flex' : 'none';
-
       const idx = state.currentFocusIndex;
       const q = state.activeQuestions[idx];
       if (!q) return;
@@ -717,39 +704,6 @@
     `).join('');
   }
 
-  // Search Bank
-  function handleSearch(keyword) {
-    if (!el.searchResults) return;
-    const term = keyword.trim().toLowerCase();
-    if (!term) {
-      el.searchResults.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 1rem;">Nhập từ khóa để tra cứu câu hỏi...</div>';
-      return;
-    }
-
-    const matches = state.allQuestions.filter(q => 
-      q.question.toLowerCase().includes(term) || 
-      q.options.some(o => o.text.toLowerCase().includes(term))
-    );
-
-    if (matches.length === 0) {
-      el.searchResults.innerHTML = `<div style="color: var(--text-muted); text-align: center; padding: 1rem;">Không tìm thấy câu hỏi nào phù hợp với "${escapeHTML(keyword)}".</div>`;
-      return;
-    }
-
-    const letters = ['A', 'B', 'C', 'D', 'E'];
-    el.searchResults.innerHTML = matches.slice(0, 30).map((q, idx) => {
-      const correctOptIdx = q.options.findIndex(o => o.is_correct);
-      const correctText = correctOptIdx >= 0 ? `${letters[correctOptIdx]}. ${q.options[correctOptIdx].text}` : 'Chưa xác định';
-
-      return `
-        <div class="search-item">
-          <div class="search-item-q">${idx + 1}. ${escapeHTML(q.question)}</div>
-          <div class="search-item-a">Đáp án đúng: ${escapeHTML(correctText)}</div>
-        </div>
-      `;
-    }).join('');
-  }
-
   // Escape HTML helper
   function escapeHTML(str) {
     if (!str) return '';
@@ -805,13 +759,6 @@
     if (el.btnRetake) {
       el.btnRetake.addEventListener('click', () => {
         initQuiz();
-      });
-    }
-
-    // Submit Quiz Button
-    if (el.btnSubmit) {
-      el.btnSubmit.addEventListener('click', () => {
-        submitQuiz(true);
       });
     }
 
@@ -881,35 +828,12 @@
       });
     }
 
-    // Search Bank Modal
-    if (el.btnSearchModal) {
-      el.btnSearchModal.addEventListener('click', () => {
-        el.searchModal.classList.add('active');
-        if (el.searchInput) {
-          el.searchInput.focus();
-          handleSearch(el.searchInput.value);
-        }
+    // Close history modal on overlay click
+    if (el.historyModal) {
+      el.historyModal.addEventListener('click', (e) => {
+        if (e.target === el.historyModal) el.historyModal.classList.remove('active');
       });
     }
-    if (el.btnCloseSearch) {
-      el.btnCloseSearch.addEventListener('click', () => {
-        el.searchModal.classList.remove('active');
-      });
-    }
-    if (el.searchInput) {
-      el.searchInput.addEventListener('input', (e) => {
-        handleSearch(e.target.value);
-      });
-    }
-
-    // Close modals on overlay click
-    [el.historyModal, el.searchModal].forEach(modal => {
-      if (modal) {
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal) modal.classList.remove('active');
-        });
-      }
-    });
 
     // Keyboard navigation in Focus mode
     window.addEventListener('keydown', (e) => {
