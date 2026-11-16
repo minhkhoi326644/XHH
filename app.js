@@ -439,7 +439,7 @@
       }
 
       return `
-        <div class="${optClass}" data-q="${idx}" data-opt="${optIdx}">
+        <div class="${optClass}" data-q="${idx}" data-opt="${optIdx}" role="button" tabindex="0">
           <div class="option-letter">${letters[optIdx]}</div>
           <div class="option-text">${escapeHTML(opt.text)}</div>
         </div>

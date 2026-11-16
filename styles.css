@@ -557,6 +557,9 @@ body.large-font {
   cursor: pointer;
   transition: var(--transition);
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .option-item:hover {
@@ -1072,19 +1075,21 @@ body.large-font {
 }
 
 .sidebar-backdrop {
-  display: none;
+  display: none !important;
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(2px);
   z-index: 1000;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.25s ease;
 }
 
 .sidebar-backdrop.active {
-  display: block;
+  display: block !important;
   opacity: 1;
+  pointer-events: auto;
 }
 
 /* Tablet & Mobile Breakpoints */
@@ -1112,10 +1117,12 @@ body.large-font {
     transform: translateY(105%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin: 0;
+    pointer-events: none;
   }
   
   .quiz-sidebar.drawer-open {
     transform: translateY(0);
+    pointer-events: auto;
   }
   
   .quiz-sidebar .sidebar-card {
