@@ -509,6 +509,9 @@
     el.questionsContainer.innerHTML = '';
 
     if (state.viewMode === 'list') {
+      // Ẩn nút nộp bài ở thanh trên khi xem dạng danh sách
+      if (el.btnSubmit) el.btnSubmit.style.display = 'none';
+
       const cardsHTML = state.activeQuestions.map((q, idx) => {
         if (state.isSubmitted && state.activeFilter !== 'all') {
           const userChoice = state.userAnswers[idx];
@@ -520,9 +523,28 @@
         return createQuestionCardHTML(q, idx);
       }).join('');
 
-      el.questionsContainer.innerHTML = cardsHTML || '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">Không có câu hỏi nào theo bộ lọc này.</div>';
+      // Nút Nộp bài lớn đặt ở cuối danh sách 50 câu (tránh phải cuộn ngược lên đầu)
+      const bottomSubmitHTML = !state.isSubmitted ? `
+        <div class="submit-list-card">
+          <button type="button" class="btn btn-success" id="btnSubmitBottom">
+            Nộp bài
+          </button>
+        </div>
+      ` : '';
+
+      el.questionsContainer.innerHTML = (cardsHTML + bottomSubmitHTML) || '<div style="padding: 2rem; text-align: center; color: var(--text-muted);">Không có câu hỏi nào theo bộ lọc này.</div>';
       bindCardEvents(el.questionsContainer);
+
+      const btnSubmitBottom = document.getElementById('btnSubmitBottom');
+      if (btnSubmitBottom) {
+        btnSubmitBottom.addEventListener('click', () => {
+          submitQuiz(true);
+        });
+      }
     } else {
+      // Hiện nút nộp bài ở thanh trên khi xem dạng từng câu
+      if (el.btnSubmit) el.btnSubmit.style.display = !state.isSubmitted ? 'inline-flex' : 'none';
+
       const idx = state.currentFocusIndex;
       const q = state.activeQuestions[idx];
       if (!q) return;
@@ -530,6 +552,7 @@
       const singleCardHTML = createQuestionCardHTML(q, idx);
       const total = state.activeQuestions.length;
 
+      // Khi đến câu cuối cùng (câu 50), nút "Câu tiếp" đổi thành "Nộp bài"
       const navHTML = `
         <div class="focus-nav">
           <button type="button" class="btn btn-secondary" id="btnPrevFocus" ${idx === 0 ? 'disabled' : ''}>
@@ -538,9 +561,15 @@
           <span style="font-weight: 600; color: var(--text-muted);">
             Câu ${idx + 1} / ${total}
           </span>
-          <button type="button" class="btn btn-primary" id="btnNextFocus" ${idx === total - 1 ? 'disabled' : ''}>
-            Câu tiếp
-          </button>
+          ${idx === total - 1 && !state.isSubmitted ? `
+            <button type="button" class="btn btn-success" id="btnSubmitFocus">
+              Nộp bài
+            </button>
+          ` : `
+            <button type="button" class="btn btn-primary" id="btnNextFocus" ${idx === total - 1 ? 'disabled' : ''}>
+              Câu tiếp
+            </button>
+          `}
         </div>
       `;
 
@@ -549,6 +578,7 @@
 
       const btnPrev = document.getElementById('btnPrevFocus');
       const btnNext = document.getElementById('btnNextFocus');
+      const btnSubmitFocus = document.getElementById('btnSubmitFocus');
 
       if (btnPrev) {
         btnPrev.addEventListener('click', () => {
@@ -564,6 +594,11 @@
             state.currentFocusIndex++;
             renderUI();
           }
+        });
+      }
+      if (btnSubmitFocus) {
+        btnSubmitFocus.addEventListener('click', () => {
+          submitQuiz(true);
         });
       }
     }

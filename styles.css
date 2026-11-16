@@ -1268,10 +1268,37 @@ body.large-font {
     min-height: 44px;
   }
   
+  .submit-list-card {
+    padding: 1.25rem 0.85rem;
+  }
+  
+  .submit-list-card .btn {
+    width: 100%;
+    padding: 0.85rem 1rem;
+  }
+  
   .modal-box {
     padding: 1.25rem 1rem;
     max-height: 92vh;
   }
+}
+
+/* Bottom Submit Card for List Mode */
+.submit-list-card {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-top: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.submit-list-card .btn {
+  padding: 0.85rem 3rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
 }
 
 /* Footer */
