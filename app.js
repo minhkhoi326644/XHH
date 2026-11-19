@@ -86,6 +86,36 @@
     return array;
   }
 
+  // Utility: Check if a question has meta/dependent options (e.g. "A và B đều đúng", "Tất cả các câu trên")
+  // For these questions, option order (A, B, C, D) MUST be preserved to prevent illogical choices like "A. A và B đều đúng"
+  function hasDependentOptions(origQ) {
+    if (!origQ || !origQ.options) return false;
+
+    return origQ.options.some(opt => {
+      const t = (opt.text || '').trim().toLowerCase();
+
+      // 1. References option letters in pairs/groups: "A và B", "A & B", "B và C", "A, B và C", "A và C", "A + B"
+      if (/\b[a-d]\s*(&|và|,|\+)\s*[a-d]\b/i.test(t)) return true;
+
+      // 2. References single option letters: "cả A", "câu A", "đáp án B", "ý C", "phương án D"
+      if (/(cả|câu|ý|đáp án|phương án)\s+[a-d]\b/i.test(t)) return true;
+
+      // 3. Letter with correctness: "A đúng", "B sai", "A và B đúng"
+      if (/\b[a-d]\s+(đều\s+)?(đúng|sai)\b/i.test(t)) return true;
+
+      // 4. Positional references: "các câu trên", "đáp án trên", "ở trên", "nêu trên", "dưới đây"
+      if (/(câu|đáp án|phương án|ý|trường hợp).*(trên|dưới)/i.test(t)) return true;
+      if (t.includes('ở trên') || t.includes('nêu trên') || t.includes('trên đều') || t.includes('dưới đây')) return true;
+
+      // 5. Collective choices: "tất cả đều đúng", "tất cả đều sai", "tất cả đúng", "cả 3 đều đúng", "không có đáp án nào"
+      if (/(tất cả|cả 3|cả ba|các câu|các đáp án|các ý)\s+(đều\s+)?(đúng|sai)/i.test(t)) return true;
+      if (t.includes('đều đúng') || t.includes('đều sai') || t.includes('tất cả đúng') || t.includes('tất cả sai')) return true;
+      if (t.includes('không có đáp án') || t.includes('không câu nào')) return true;
+
+      return false;
+    });
+  }
+
   // Shuffle Question and its Options safely
   function prepareQuestion(origQ) {
     const qCopy = {
@@ -94,34 +124,15 @@
       options: []
     };
 
-    // Check if options refer to specific other letters (e.g. "Cả A và B", "Câu a và c")
-    const hasMetaLetter = origQ.options.some(opt => {
-      const t = opt.text.toLowerCase();
-      return /cả\s+[a-d]|câu\s+[a-d]/.test(t);
-    });
-
-    // Check if option is "Tất cả các câu trên đều đúng" or "Tất cả đều đúng"
-    const allAboveOpt = origQ.options.find(opt => {
-      const t = opt.text.toLowerCase();
-      return t.includes('tất cả các câu trên') || t.includes('tất cả các đáp án trên') || t.includes('tất cả đều đúng') || t.includes('tất cả đều sai');
-    });
-
-    if (hasMetaLetter) {
-      // Keep option order for questions where options explicitly refer to "A và B", "a và c"
+    if (hasDependentOptions(origQ)) {
+      // Giữ nguyên 100% thứ tự các đáp án gốc A, B, C, D để câu hỏi luôn hợp lý logic
+      // (Không bao giờ xảy ra tình trạng "A. A và B đều đúng" hoặc đảo "Tất cả các câu trên" lên đầu)
       qCopy.options = origQ.options.map(opt => ({
         text: opt.text,
         is_correct: opt.is_correct
       }));
-    } else if (allAboveOpt && origQ.options.indexOf(allAboveOpt) === origQ.options.length - 1) {
-      // If "Tất cả đều đúng" is the last option, shuffle top options (A, B, C) and keep "Tất cả" at the bottom
-      const topOpts = origQ.options.slice(0, -1);
-      const shuffledTop = shuffleArray(topOpts);
-      qCopy.options = [...shuffledTop, allAboveOpt].map(opt => ({
-        text: opt.text,
-        is_correct: opt.is_correct
-      }));
     } else {
-      // Standard: shuffle all options completely
+      // Các câu hỏi độc lập: xáo trộn ngẫu nhiên các đáp án bình thường
       const shuffledOpts = shuffleArray(origQ.options);
       qCopy.options = shuffledOpts.map(opt => ({
         text: opt.text,
